@@ -42,6 +42,17 @@ Note that the values on the relationship panel (excluding the counters) are limi
 
 Read on if you want the technical details on how the game saves progress
 
+### Some interesting Facts to modify [SPOILERS!]:
+<details>
+  <summary>Spoiler warning</summary>
+
+- `S4500_NoraLeaves` is set to `true` if Nora has decided to leave. Set in scene 2-7 "Nora's Grief" but doesn't come into effect until three or four scenes later.
+- `S1000_DIA_CatColour`: change cat color (and name). 
+- `Sxxxx_BAR_Ending_IsPresent_SUM`: set to `true` if Nora is still present at the unboxing. If you set the above value, you probably need to set this accordingly. During a regular playthrough this will be the same as `S4500_NoraLeaves`
+- `Sxxxx_BAR_Ending_IsPresent_AUT`: set to `true` if Autumn has decided that she stays. This is set in scene `2-16 Enter the Void` and used in the next one (so you can set this and replay from that scene to get another ending). I suggest you try out some of the combinations of these last two, the differences are really interesting.
+  
+</details>
+
 # Note
 I got the code that uses the oodle dll from somewhere. That was on one of two days where I was trying to find out what compression method they used and failed. I therefore cannot remember where I got this code from, and at this point I am way to tired to re-trace my steps. So if the code in Oodle/imports.cs or Oodle/oodle.cs looks familiar to you (or if you wrote it), let me know so I can add the necessary attributions.
 
