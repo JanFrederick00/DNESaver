@@ -42,7 +42,10 @@ Note that the values on the relationship panel (excluding the counters) are limi
 
 Read on if you want the technical details on how the game saves progress
 
-## Savegame structure
+# Note
+I got the code that uses the oodle dll from somewhere. That was on one of two days where I was trying to find out what compression method they used and failed. I therefore cannot remember where I got this code from, and at this point I am way to tired to re-trace my steps. So if the code in Oodle/imports.cs or Oodle/oodle.cs looks familiar to you (or if you wrote it), let me know so I can add the necessary attributions.
+
+# Savegame structure
 
 Savegames are stored (at least on Windows) in the LocalAppData folder. A subfolder `Bloom&Rage` is created which contains a single `Saved` subfolder.
 
