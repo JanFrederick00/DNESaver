@@ -13,10 +13,8 @@
 		<SelfContained>true</SelfContained>
 		<AssemblyFileVersion>1.1.0</AssemblyFileVersion>
 		<AssemblyVersion>1.1.0</AssemblyVersion>
-		<FileVersion>1.1.0</FileVersion>
+		<ApplicationVersion>1.1.0</ApplicationVersion>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-		<PackageIcon>dnee.png</PackageIcon>
-		<ApplicationIcon>dnee.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,14 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="dnee.ico" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="dnee.png">
-		  <Pack>True</Pack>
-		  <PackagePath>\</PackagePath>
-		</None>
 		<None Update="fact_defs.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

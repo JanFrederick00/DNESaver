@@ -90,9 +90,15 @@ namespace DNESaver.UI
         public SaveFilePatcher Patcher { get; }
         public SavegameModifier Modifier { get; }
 
-        public SaveEditor(SaveFilePatcher patcher, SavegameModifier modifier)
+        public string SavegameLocation { get; set; }
+
+        public SaveEditor(SaveFilePatcher patcher, SavegameModifier modifier, string SavegameLocation)
         {
+            this.SavegameLocation = SavegameLocation;
             InitializeComponent();
+
+            Title = $"Bloom & Rage Savegame Editor - {SavegameLocation}";
+
             EditableFactsView.SortDescriptions.Add(new SortDescription() { PropertyName = nameof(EditableFact.SortableValue), Direction = ListSortDirection.Ascending });
             Patcher = patcher;
             Modifier = modifier;
@@ -132,24 +138,6 @@ namespace DNESaver.UI
                 EditableScenes.Add(new() { Relationships = scene.Value, SceneId = scene.Key, SceneName = scene.Key == "global" ? "Current Snapshot" : SavegameModifier.SceneNameMappings[scene.Key] });
             }
 
-            foreach(var ec in EditableScenes.Skip(5))
-            {
-                if(ec.SceneName.StartsWith("1-"))
-                {
-                    ec.Relationships[0].level = 2;
-                    ec.Relationships[1].level = 2;
-                    ec.Relationships[2].level = 2;
-                    ec.Relationships[3].level = 2;
-                    ec.Relationships[4].level = 2;
-                } else
-                {
-                    ec.Relationships[0].level = 5;
-                    ec.Relationships[1].level = 5;
-                    ec.Relationships[2].level = 2;
-                    ec.Relationships[3].level = 5;
-                    ec.Relationships[4].level = 2;
-                }
-            }
         }
 
         public ObservableCollection<EditableFact> EditableFacts { get; set; } = [];
@@ -220,5 +208,22 @@ namespace DNESaver.UI
         }
 
         public bool WasSuccesful = false;
+        public bool LaunchGame = false;
+
+        private void OpenSavegameLocation(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("explorer", SavegameLocation);
+            }
+            catch (Exception)
+            { }
+        }
+
+        private void SaveCloseAndLaunch(object sender, RoutedEventArgs e)
+        {
+            LaunchGame = true;
+            SaveAndClose(sender, e);
+        }
     }
 }

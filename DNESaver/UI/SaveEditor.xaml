@@ -5,20 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DNESaver.UI"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="SaveEditor" Height="450" Width="800">
+        Title="SaveEditor" Height="450" Width="800" FontSize="14">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <TabControl>
+        <Menu Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="Open Savegame location" Click="OpenSavegameLocation"/>
+                <MenuItem Header="Apply Changes and Close" Click="SaveAndClose"/>
+                <MenuItem Header="Apply Changes, Close Editor and Launch Game" Click="SaveCloseAndLaunch"/>
+            </MenuItem>
+        </Menu>
+        <TabControl Grid.Row="1">
             <TabItem Header="Facts">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBox Grid.Row="0" Margin="2" FontSize="14" Padding="2" Name="search" TextChanged="search_TextChanged"/>
+                    <TextBox Grid.Row="0" Margin="2" Padding="2" Name="search" TextChanged="search_TextChanged"/>
                     <ItemsControl ScrollViewer.CanContentScroll="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingStackPanel.VirtualizationMode="Recycling" Grid.Row="1" ItemsSource="{Binding EditableFactsView}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -37,25 +45,25 @@
                                 <Border Background="#e0e0e0" Padding="5" Margin="10,5" BorderThickness="1" CornerRadius="8">
                                     <Grid ToolTip="{Binding ToolTip, Mode=OneWay}">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition Width="100"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="125"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="auto"/>
                                             <RowDefinition Height="auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
-                                        <CheckBox Grid.RowSpan="2" Grid.Column="3" VerticalAlignment="Center" IsChecked="{Binding ChangeValue}" >Change Value</CheckBox>
-                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold" FontSize="14" Text="{Binding DispFactName, Mode=OneWay}"/>
-                                        <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" FontWeight="Light" FontSize="14" Text="{Binding DispLine2, Mode=OneWay}"/>
-                                        <TextBlock Grid.Row="2" Grid.ColumnSpan="4" Text="{Binding TimelineString, Mode=OneWay}"  Margin="10,0,0,0"/>
+                                        <CheckBox Grid.RowSpan="3" Grid.Column="3" VerticalAlignment="Center" IsChecked="{Binding ChangeValue}" >Change Value</CheckBox>
+                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold" Text="{Binding DispFactName, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" FontWeight="Light" Text="{Binding DispLine2, Mode=OneWay}"/>
+                                        <TextBlock Grid.Row="2" Grid.ColumnSpan="1" Text="{Binding TimelineString, Mode=OneWay}"  Margin="10,0,0,0"/>
 
-                                        <TextBlock Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Center">New Value:</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.RowSpan="3" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Center">New Value:</TextBlock>
 
-                                        <Grid  Grid.Column="2" Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                            <TextBox Text="{Binding NewValueInt, UpdateSourceTrigger=PropertyChanged}" FontSize="14" Padding="2" MinWidth="40"/>
+                                        <Grid  Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <TextBox Text="{Binding NewValueInt, UpdateSourceTrigger=PropertyChanged}"  Padding="5,2" MinWidth="40"/>
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -67,8 +75,8 @@
                                                 </Style>
                                             </Grid.Style>
                                         </Grid>
-                                        <Grid Grid.Column="2" Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                            <TextBox Text="{Binding NewValueFloat, UpdateSourceTrigger=PropertyChanged}" FontSize="14" Padding="2" MinWidth="40"/>
+                                        <Grid Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <TextBox Text="{Binding NewValueFloat, UpdateSourceTrigger=PropertyChanged}" Padding="5,2" MinWidth="40"/>
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -80,7 +88,7 @@
                                                 </Style>
                                             </Grid.Style>
                                         </Grid>
-                                        <Grid Grid.Column="2" Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                        <Grid Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center">
                                             <ComboBox SelectedItem="{Binding NewValueBYTE}" ItemsSource="{Binding EnumValues}" MinWidth="55" FontSize="14"/>
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
@@ -189,7 +197,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button Grid.Row="1" Margin="5" FontSize="14" HorizontalAlignment="Right" Padding="5,2" Click="SaveAndClose">
+        <Button Grid.Row="2" Margin="5" FontSize="14" HorizontalAlignment="Right" Padding="5,2" Click="SaveAndClose">
             Save &amp; Close
         </Button>
     </Grid>

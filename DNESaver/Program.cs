@@ -13,80 +13,106 @@ internal class Program
         if (!File.Exists(oodle_dll))
         {
             MessageBox.Show($"The Game uses Oodle to compress its savegame.\nAs it is a proprietary DLL I can't distribute the relevant library with this tool.\n\nPlease acquire a copy of the File 'oo2core_5_win64.dll' and put it in the following location:\n{oodle_dll}", "Missing DLL");
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://www.google.com/search?q=oo2core_5_win64.dll&peek_pws=0") { UseShellExecute = true });
             return -1;
         }
 
         string savegameBaseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Bloom&Rage", "Saved", "SaveGames");
         string savegameDir = Directory.Exists(savegameBaseDir) ? Directory.EnumerateDirectories(savegameBaseDir).First() : "";
 
-        OverviewWindow window = new(savegameDir);
 
         if (!Directory.Exists(savegameBaseDir) || !Directory.Exists(savegameDir))
         {
-            window.AddLine($"Error: The savegame directory {savegameBaseDir} does not exist.");
+            Console.WriteLine($"Error: The savegame directory {savegameBaseDir} does not exist.");
+            MessageBox.Show($"Error: The savegame directory {savegameBaseDir} does not exist.");
+            return -1;
+        }
+
+        string savegameBackupDir = Path.Combine(savegameDir, "_Backups");
+        Console.WriteLine($"Using Savegame location: {savegameDir}");
+        Directory.CreateDirectory(savegameBackupDir);
+
+        string Slot0Filename = Path.Combine(savegameDir, "0GameSave.sav");
+
+
+        Console.WriteLine($"Opening: {Slot0Filename}");
+        DNESaveFile savefile = new(Slot0Filename);
+
+        if (savefile.IsCompressed)
+        {
+            Console.WriteLine($"The Savegame was compressed, meaning it was last written by the game.");
+            Console.WriteLine("Checking for Backups...");
+
+            static string str(byte[] dat) => string.Concat(dat.Select(s => s.ToString("X2")));
+            var mymd5 = str(MD5.HashData(File.ReadAllBytes(savefile.FileName)));
+            Console.WriteLine($"Hash of opened Savegame: {mymd5}");
+
+            bool backed_up = false;
+            foreach (var file in Directory.EnumerateFiles(savegameBackupDir, "*.sav"))
+            {
+                var thismd5 = str(MD5.HashData(File.ReadAllBytes(file)));
+                if (thismd5 == mymd5)
+                {
+                    backed_up = true;
+                    Console.WriteLine($"Backup already present under {file}");
+                    break;
+                }
+            }
+
+            if (!backed_up)
+            {
+                string backupName = Path.Combine(savegameBackupDir, $"0Backup_{DateTime.Now:yyyyMMdd_HHmmss}.sav");
+                File.Copy(savefile.FileName, backupName, false);
+                Console.WriteLine($"A Backup copy of the Savegame in slot 0 was made under: {backupName}");
+                MessageBox.Show($"A Backup copy of the Savegame in slot 0 was made under: {backupName}");
+            }
         }
         else
         {
-            string savegameBackupDir = Path.Combine(savegameDir, "_Backups");
-            window.AddLine($"Using Savegame location: {savegameDir}");
-            Directory.CreateDirectory(savegameBackupDir);
+            Console.WriteLine("The Savegame was not compressed. This implies that the file was last modified by this tool. No Backup will be created.");
+        }
 
-            string Slot0Filename = Path.Combine(savegameDir, "0GameSave.sav");
+        try
+        {
 
-            Task.Run(() =>
+            string workingFilePath = Path.Combine(savegameDir, "CurrentWorkingFile.sav");
+            savefile.WriteSavegameTo(workingFilePath);
+            Console.WriteLine($"An uncompressed version of the savegame in slot 0 has been created under: {workingFilePath}");
+            Console.WriteLine("");
+
+            var patcher = new SaveFilePatcher(workingFilePath);
+            var mgr = new SavegameModifier(savefile, patcher);
+
+            SaveEditor se = new(patcher, mgr, savegameDir);
+            se.ShowDialog();
+            if (se.WasSuccesful)
             {
-                window.AddLine($"Opening: {Slot0Filename}");
-                DNESaveFile savefile = new(Slot0Filename);
+                Console.WriteLine("Patching was successful; Copying working file to Slot 0...");
+                File.Copy(workingFilePath, Slot0Filename, true);
 
-                if (savefile.IsCompressed)
+                if (se.LaunchGame)
                 {
-                    window.AddLine($"The Savegame was compressed, meaning it was last written by the game.");
-                    window.AddLine("Checking for Backups...");
-
-                    static string str(byte[] dat) => string.Concat(dat.Select(s => s.ToString("X2")));
-                    var mymd5 = str(MD5.HashData(File.ReadAllBytes(savefile.FileName)));
-                    window.AddLine($"Hash of opened Savegame: {mymd5}");
-
-                    bool backed_up = false;
-                    foreach (var file in Directory.EnumerateFiles(savegameBackupDir, "*.sav"))
+                    string url = "steam://launch/1902960/dialog";
+                    try
                     {
-                        var thismd5 = str(MD5.HashData(File.ReadAllBytes(file)));
-                        if (thismd5 == mymd5)
-                        {
-                            backed_up = true;
-                            Console.WriteLine($"Backup already present under {file}");
-                            break;
-                        }
-                    }
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
 
-                    if (!backed_up)
-                    {
-                        string backupName = Path.Combine(savegameBackupDir, $"0Backup_{DateTime.Now:yyyyMMdd_HHmmss}.sav");
-                        File.Copy(savefile.FileName, backupName, false);
-                        window.AddLine($"A Backup copy of the Savegame in slot 0 was made under: {backupName}");
                     }
+                    catch (Exception) { }
                 }
                 else
                 {
-                    window.AddLine("The Savegame was not compressed. This implies that the file was last modified by this tool. No Backup will be created.");
+                    MessageBox.Show("Your save game was successfully patched.");
                 }
-
-
-                string workingFilePath = Path.Combine(savegameDir, "CurrentWorkingFile.sav");
-                savefile.WriteSavegameTo(workingFilePath);
-                window.AddLine($"An uncompressed version of the savegame in slot 0 has been created under: {workingFilePath}");
-                window.AddLine("");
-
-                window.SaveFile = savefile;
-                window.WorkingFilePath = workingFilePath;
-                window.Slot0Filename = Slot0Filename;
-
-                window.AddLine("All good, you can now open the save editor.");
-
-            });
+            }
         }
-
-        window.ShowDialog();
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            MessageBox.Show($"An error occured: {ex.Message}");
+            return -1;
+        }
 
         return 0;
     }
