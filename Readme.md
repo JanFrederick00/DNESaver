@@ -14,7 +14,7 @@ It will create a backup directory and make sure the savegame currently in slot 0
 
 The save file will be decompressed (if necessary) and a working copy will be created in the save folder.
 
-You can now click on the button to open the save editor.
+The save editor will open.
 
 ### Editing game Facts
 On the first tab the game's "facts" may be edited. 
