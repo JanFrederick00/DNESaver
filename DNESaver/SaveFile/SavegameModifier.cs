@@ -47,7 +47,11 @@ namespace DNESaver
 
                 string LastSceneName = "(before game)";
                 int idx = SavegameModifier.SceneNameMappings.Keys.ToList().IndexOf(tl.Key) - 1;
-                if (idx >= 0)
+                if (tl.Key == "S6200_10" || tl.Key == "S6300_10" || tl.Key == "S6400_10" || tl.Key == "S6500_10")
+                {
+                    LastSceneName = "2-17 Time Capsule";
+                }
+                else if (idx >= 0)
                 {
                     LastSceneName = SavegameModifier.SceneNameMappings[SavegameModifier.SceneNameMappings.Keys.ToList()[idx]];
                 }
@@ -135,8 +139,11 @@ namespace DNESaver
     {"S5500_10", "2-15 The Wolf Among Us"},
     {"S5600_10", "2-16 Enter the Void "},
     {"S6100_10", "2-17 Time Capsule "},
-    {"S6200_10", "2-18 Remember Us"},
-    {"S6600_10", "2-19 Lost Records"},
+    {"S6200_10", "2-18 Remember Us"},       // Ending 1
+    {"S6300_10", "2-18 Remember Us"},       // Ending 2
+    {"S6400_10", "2-18 Remember Us"},       // Ending 3
+    {"S6500_10", "2-18 Remember Us"},       // Ending 4
+    {"S6600_10", "2-19 Lost Records"},      // Post Creds
 };
 
         private readonly DNESaveFile savefile;
@@ -266,7 +273,13 @@ namespace DNESaver
             bool success = true;
             foreach (var SceneId in Scenes)
             {
-                var scene = SceneSnapshots[SceneId] ?? throw new Exception($"Scene {SceneId} not found."); ;
+                var scene = SceneSnapshots[SceneId];
+                if (scene == null)
+                {
+                    Console.WriteLine($"Warning: Scene {SceneId} not found.");
+                    continue;
+                }
+
                 success &= ModifyFact(scene, fact, value);
             }
 
@@ -301,7 +314,13 @@ namespace DNESaver
             DNESaveFile.SavProperty SceneSnapshots = savefile["SceneSnapshots"] ?? throw new Exception("SceneSnapshots not found.");
             foreach (var SceneId in Scenes)
             {
-                var scene = SceneSnapshots[SceneId] ?? throw new Exception($"Scene {SceneId} not found."); ;
+                var scene = SceneSnapshots[SceneId];
+                if (scene == null)
+                {
+                    Console.WriteLine($"Warning: Scene {SceneId} not found.");
+                    continue;
+                }
+
                 ModifySave(scene, rel);
             }
 
@@ -366,7 +385,14 @@ namespace DNESaver
 
             foreach (var SceneId in SceneNameMappings)
             {
-                var scene = SceneSnapshots[SceneId.Key] ?? throw new Exception($"Scene {SceneId} not found."); ;
+
+                var scene = SceneSnapshots[SceneId.Key];
+                if (scene == null)
+                {
+                    Console.WriteLine($"Warning: Scene {SceneId.Key} not found.");
+                    continue;
+                }
+
                 ProcessScene(scene, SceneId.Key);
             }
 
